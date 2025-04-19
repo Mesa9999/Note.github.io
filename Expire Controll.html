@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expire Controll</title>
+  <link rel="stylesheet" href="Expire Controll.css">
+</head>
+<body>
+  <h1>Expire Controll</h1>
+    <form id="dataForm">
+      <h3><table>
+        <thead>
+          <th>Barcode&nbsp;:</th><td><input type="text" id="barcode" placeholder="Barcode"></td>
+          <th>Quantity&nbsp;:</th><td><input type="number" id="qty" placeholder="Quantity"></td>
+        </thead>
+        <thead>
+          <th>&nbsp;</th>
+        </thead>
+        <thead>
+          <th>ExpireDate&nbsp;:</th><td><input type="tel" id="expireDate" placeholder="Expire Date"></td>
+          <th>Remark&nbsp;:</th><td><input type="text" id="remark" placeholder="Remark"></td>
+        </thead>
+      </table>
+    </h3>
+          <button type="submit">Submit</button>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button class="export-btn" onclick="exportToExcel()" >Downlaod</button>
+          <button type="button" id="refreshBtn">Refresh</button>
+          <br><br>
+          
+    </form>
+      <table id="dataTable" border="1">
+          <thead style="height: 60px;">
+            <th style="width: 20%;">Barcode</th>
+            <th style="width: 20%;">Quantity</th>
+            <th style="width: 40%;">Expire Date</th>
+            <th>Remark</th>
+          </thead>
+          <tbody>
+
+          </tbody>
+      </table>
+   <script>
+    
+window.onload = function () {
+      const savedData = JSON.parse(localStorage.getItem("userData")) || [];
+      savedData.forEach((item, i) => {
+        addRowToTable(item.barcode, item.qty, item.expireDate, item.remark);
+      });
+      index = savedData.length + 1;
+    };
+
+
+
+           document.getElementById("dataForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const barcode = document.getElementById("barcode").value.trim();
+      const qty = document.getElementById("qty").value.trim();
+      const expireDate = document.getElementById("expireDate").value.trim();
+      const remark = document.getElementById("remark").value.trim();
+      if (barcode === "" || qty === "" || expireDate==="") {
+        alert("Please check information");
+        return;
+      }
+      
+      // Save to table
+      addRowToTable(barcode, qty, expireDate ,remark);
+
+      // Save to localStorage
+      let savedData = JSON.parse(localStorage.getItem("userData")) || [];
+      savedData.push({ barcode, qty, expireDate, remark});
+      localStorage.setItem("userData", JSON.stringify(savedData));
+
+      index++;
+      document.getElementById("dataForm").reset();
+    });
+
+    // Add data to table
+    function addRowToTable(barcode, qty, expireDate, remark) {
+      const tableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+      const newRow = tableBody.insertRow();
+
+      newRow.insertCell(0).textContent = barcode;
+      newRow.insertCell(1).textContent = qty;
+      newRow.insertCell(2).textContent = expireDate;
+      newRow.insertCell(3).textContent = remark;
+      
+    }
+
+    // Refresh button to clear data and reload page
+    document.getElementById("refreshBtn").addEventListener("click", function () {
+      if (confirm("តើអ្នកប្រាកដថាចង់សម្អាតទិន្នន័យទាំងអស់មែនទេ?")) {
+        localStorage.removeItem("userData"); // clear data
+        location.reload(); // reload page
+      }
+    });
+    document.getElementById("barcode").addEventListener("keydown",function(event){
+  if (event.key==="Enter"){
+    event.preventDefault();
+    document.getElementById("qty").focus();
+  }
+});
+document.getElementById("qty").addEventListener("keydown",function(event){
+  if (event.key==="Enter"){
+    event.preventDefault();
+    document.getElementById("expireDate").focus();
+  }
+});
+document.getElementById("expireDate").addEventListener("keydown",function(event){
+  if (event.key==="Enter"){
+    event.preventDefault();
+    document.getElementById("remark").focus();
+  }
+});
+document.getElementById("barcode").addEventListener("keydown",function(event){
+  if (event.key==="Enter"){
+    event.preventDefault();
+    document.getElementById("qty").focus();
+  }
+});
+    
+    function exportToExcel(){
+        let table=document.getElementById("dataTable");
+        let html=table.outerHTML;
+        let url='data:application/vnd.ms-excel,'+encodeURIComponent(html);
+        let link=document.createElement("a");
+        link.href=url;
+        link.download='datatable.xls';
+        link.click();
+    }
+   </script>
+   <script src="Expire Controll.js"></script>
+</body>
+</html>
